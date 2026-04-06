@@ -32,6 +32,58 @@ app.post("/webhook", async (req, res) => {
 
   if (message) {
     const from = message.from;
+    const text = message.text?.body?.toLowerCase();
+
+    console.log("Message:", text);
+
+    // Product list
+    const products = {
+      "bag": {
+        name: "Premium Travel Bag",
+        price: "990 TK",
+        image: "https://via.placeholder.com/300",
+        description: "High quality stylish bag"
+      },
+      "watch": {
+        name: "Luxury Watch",
+        price: "650 TK",
+        image: "https://via.placeholder.com/300",
+        description: "Stylish watch for men"
+      }
+    };
+
+    if (products[text]) {
+      const product = products[text];
+
+      await axios.post(
+        `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
+        {
+          messaging_product: "whatsapp",
+          to: from,
+          type: "image",
+          image: {
+            link: product.image,
+            caption: `📦 ${product.name}\n💰 Price: ${product.price}\n📝 ${product.description}`
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    } else {
+      await sendMessage(from, "দয়া করে bag / watch লিখুন");
+    }
+  }
+
+  res.sendStatus(200);
+});
+  const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+
+  if (message) {
+    const from = message.from;
     const text = message.text?.body;
 
     console.log("Message:", text);
