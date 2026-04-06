@@ -4,11 +4,9 @@ const app = express();
 
 app.use(express.json());
 
-const VERIFY_TOKEN = "juyel123";
+const ACCESS_TOKEN = "EAAZBDZCswgNHMBRHslekXl8XePHQ9MoayFz5JLR7ZCNSBhSZCDzTCMzwIBqmKg7kagAZCgJZBgZCrHO9F5dREIgzDGBIxuhQXY0Gu79ZAlCygMA531Dr3M7S3ffsZBadbAEo8ZA9KvYvzVxZCJBBViJ4c9JwlPXvgi3Kw3ZCOhPIBQzLHtQpBclZA36ZBKNHquoay5s1OhTCIHZBvNYXf6OCVENvKanJgwzAJX7uvZBZAGCP2N6JzIZBoyEPREqRH6fGCWZC0rRbBh3ZCr4EhSM8ViJKBnTp0ZAvm";
 
-// তোমার Meta থেকে নেয়া তথ্য
-const ACCESS_TOKEN = "YOUR_ACCESS_TOKEN";
-const PHONE_NUMBER_ID = "YOUR_PHONE_NUMBER_ID";
+const PHONE_NUMBER_ID = "1073349015858656";
 
 // Home
 app.get("/", (req, res) => {
