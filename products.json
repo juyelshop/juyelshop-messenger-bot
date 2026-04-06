@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Stylish Bag",
+    "price": "৳1200",
+    "image": "https://juyelshop.com/images/bag1.jpg",
+    "guideline": "ব্যাগটি কিভাবে ব্যবহার করবেন এবং কেয়ার করতে হবে সেই নির্দেশনা"
+  },
+  {
+    "name": "Comfort Shoes",
+    "price": "৳2000",
+    "image": "https://juyelshop.com/images/shoes1.jpg",
+    "guideline": "জুতার সঠিক সাইজ এবং পরিচর্যা নির্দেশিকা"
+  },
+  {
+    "name": "Classic Watch",
+    "price": "৳3500",
+    "image": "https://juyelshop.com/images/watch1.jpg",
+    "guideline": "ওয়াচ ব্যবহার এবং কেয়ার গাইডলাইন"
+  }
+]
