@@ -6,65 +6,69 @@ const app = express();
 app.use(express.json());
 
 const VERIFY_TOKEN = "juyel123";
-const ACCESS_TOKEN = "YOUR_ACCESS_TOKEN= "EAAZBDZCswgNHMBRLNHwI5zW7FwalF9qcb5UgDs5wgoTPbg5zBSHOFaiyGNsDQ2mE22xUJZCFiAT29dp36eOBPbm5HQg67gMq6wkTYYXtR7wGNptytjD2GUbgOEa820ZBNUXEcYO4q4TNLycZClN6lCrFg7FOZB9T1PziZB0aRWdCjLWZASqCbZAwxvKFpqZABBjmZCoPOBk8b1Y5acWbCTLljZCY3SopFfKU8ZAzMKBYEAkl515ISl7vXAZBrrZCj9H7ZCTXZBVrs686Ys1LzBx8eyEpvwZAQg";
+
+const ACCESS_TOKEN = "EAAZBDZCswgNHMBRDAqqWS2ZCkCjiXpc553peZAngIehK5V7och9PECYB4ECC4LjZCxR1EofYKJcI58ybtPcdZBHZByVZCKTR25nMtqGqGqtI28td2lektYkhRb46IZBHUPvbShgJvAWP7udUPeug6nCiviZCS223zBMnMdcV7fgcfSgkPVgZCbbMbro4c63GpNIulKdBkvJTm5hkDScye9iP1dHkLrYxoZBne1NNaq9ycgfxl7ZAhR5ocnRCraN0W7QcDrHZAq0Xyt51HamI1DUHyYDpZCuSgZDZD";
+
 const PHONE_NUMBER_ID = "1073349015858656";
 
 // Home
 app.get("/", (req, res) => {
-  res.send("WhatsApp Bot Running ✅");
+  res.send("Bot Running ✅");
 });
 
 // Webhook verify
 app.get("/webhook", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
-
-  if (mode && token === VERIFY_TOKEN) {
-    res.status(200).send(challenge);
-  } else {
-    res.sendStatus(403);
+  if (req.query["hub.verify_token"] === VERIFY_TOKEN) {
+    return res.send(req.query["hub.challenge"]);
   }
+  return res.sendStatus(403);
 });
 
-// 🔍 WEBSITE SCRAPER FUNCTION
-async function getProductFromWebsite(keyword) {
+// 🔍 Scraper Function (Improved)
+async function getProduct(keyword) {
   try {
-    const url = "https://juyelshop.com/";
-    const { data } = await axios.get(url);
-
+    const { data } = await axios.get("https://juyelshop.com/");
     const $ = cheerio.load(data);
 
-    let foundProduct = null;
+    let result = null;
 
-    $(".product, .product-item, .card").each((i, el) => {
-      const name = $(el).find("h2, h3, .title").text().trim();
-      const price = $(el).find(".price").text().trim();
-      const image = $(el).find("img").attr("src");
+    $("img").each((i, el) => {
+      const parentText = $(el).parent().text().toLowerCase();
 
-      if (name.toLowerCase().includes(keyword.toLowerCase())) {
-        foundProduct = {
-          name,
-          price,
-          image: image?.startsWith("http")
-            ? image
-            : "https://juyelshop.com" + image
+      if (parentText.includes(keyword.toLowerCase())) {
+        const name = $(el).attr("alt") || "Product";
+
+        const priceMatch = parentText.match(/\d+\s?tk/);
+        const price = priceMatch ? priceMatch[0].toUpperCase() : "Price not found";
+
+        let image = $(el).attr("src");
+
+        if (image && !image.startsWith("http")) {
+          image = "https://juyelshop.com" + image;
+        }
+
+        result = {
+          name: name,
+          price: price,
+          image: image || "https://via.placeholder.com/300"
         };
+
         return false;
       }
     });
 
-    return foundProduct;
+    return result;
 
   } catch (err) {
-    console.log("Scraping error:", err.message);
+    console.log("Scraper error:", err.message);
     return null;
   }
 }
 
-// Webhook receive
+// 📩 Receive message
 app.post("/webhook", async (req, res) => {
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+
   if (!message) return res.sendStatus(200);
 
   const from = message.from;
@@ -72,25 +76,27 @@ app.post("/webhook", async (req, res) => {
 
   if (!text) return res.sendStatus(200);
 
-  console.log("Message:", text);
+  console.log("User:", text);
 
   try {
-    let responseData;
+    let payload;
 
     // 👋 Greeting
     if (/^(hi|hello|হাই|হ্যালো)$/i.test(text)) {
-      responseData = {
+      payload = {
         type: "text",
-        data: { body: "👋 স্বাগতম!\nআপনি কোন প্রোডাক্ট খুঁজছেন? লিখুন (bag, watch...)" }
+        data: {
+          body: "👋 স্বাগতম!\nআপনি কোন প্রোডাক্ট খুঁজছেন?\n👉 bag / watch লিখুন"
+        }
       };
     }
 
-    // 🔍 Product Search
+    // 🔍 Product search
     else {
-      const product = await getProductFromWebsite(text);
+      const product = await getProduct(text);
 
       if (product) {
-        responseData = {
+        payload = {
           type: "image",
           data: {
             link: product.image,
@@ -98,9 +104,11 @@ app.post("/webhook", async (req, res) => {
           }
         };
       } else {
-        responseData = {
+        payload = {
           type: "text",
-          data: { body: "❌ প্রোডাক্ট পাওয়া যায়নি। অন্য কিছু লিখুন।" }
+          data: {
+            body: "❌ প্রোডাক্ট পাওয়া যায়নি। অন্য কিছু লিখুন।"
+          }
         };
       }
     }
@@ -111,7 +119,7 @@ app.post("/webhook", async (req, res) => {
       {
         messaging_product: "whatsapp",
         to: from,
-        [responseData.type]: responseData.data
+        [payload.type]: payload.data
       },
       {
         headers: {
