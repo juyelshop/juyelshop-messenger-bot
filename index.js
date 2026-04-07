@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 // ============================
-// Your credentials (do not share publicly!)
+// Credentials (তোমার দেওয়া)
 // ============================
 const VERIFY_TOKEN = "juyel123";
 const ACCESS_TOKEN = "EAANizvxgfaYBRNGHubwIKPgnlLQkm6bl9bLEhpIZCJO7cUMvcMNpGQcb6OcgZCt8MpsTyaHHfksrZBLPc8Eqf3FFOSDfvpX50Del2i519vmvfzSFadXT4gOBWELOGEUDFw1fZAHTsTfSHjaReAyc02094Xd6DViuSz953OliiZCc71vmY7KbYLkIgxagBhGzvwZAKyfxSZC5MZBnMBiul07BIoLHs3kW9LpaMLzh9jbzOemVyAvJtKb1rppGW3HlMxeIyRAiIMrtC3m32bbRjstZC";
@@ -15,15 +15,15 @@ const GEMINI_API_KEY = "AIzaSyCQGQooNNnYfO-gR5ni9MNh2eome7u49M4";
 const PORT = 3000;
 
 // ============================
-// Routes
+// Home route
 // ============================
-
-// Home
 app.get("/", (req, res) => {
   res.send("AI WhatsApp Bot Running 🤖");
 });
 
+// ============================
 // Webhook verification
+// ============================
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -39,19 +39,19 @@ app.get("/webhook", (req, res) => {
 });
 
 // ============================
-// AI function with error logging
+// AI Response function
 // ============================
 async function getAIResponse(userText) {
   try {
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/text-bison-001:generateText?key=${GEMINI_API_KEY}`,
       {
-        contents: [
-          { parts: [{ text: userText }] }
-        ]
+        prompt: [{ text: userText }],
+        temperature: 0.7,
+        candidate_count: 1
       }
     );
-    return response.data.candidates[0].content.parts[0].text;
+    return response.data.candidates[0].content[0].text;
   } catch (err) {
     console.log("AI API Error:", err.response?.data || err.message);
     return "দুঃখিত, এখন উত্তর দিতে সমস্যা হচ্ছে।";
@@ -64,12 +64,10 @@ async function getAIResponse(userText) {
 app.post("/webhook", async (req, res) => {
   try {
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-
     if (!message) return res.sendStatus(200);
 
     const from = message.from;
     const text = message?.text?.body || "";
-
     console.log("User:", text);
 
     let reply = "";
@@ -80,7 +78,6 @@ app.post("/webhook", async (req, res) => {
     } else if (text.toLowerCase().includes("price")) {
       reply = "দাম জানতে ভিজিট করুন: https://juyelshop.com/";
     } else {
-      // AI reply
       reply = await getAIResponse(text);
     }
 
@@ -104,6 +101,7 @@ app.post("/webhook", async (req, res) => {
     } catch (err) {
       console.log("WhatsApp send error:", err.response?.data || err.message);
     }
+
   } catch (err) {
     console.log("Webhook processing error:", err.message);
   }
