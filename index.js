@@ -1,60 +1,74 @@
+// index.js
 const express = require("express");
 const axios = require("axios");
-
 const app = express();
+
 app.use(express.json());
 
-// ðŸ”¹ CONFIG
+// ============================
+// Your credentials (do not share publicly!)
+// ============================
 const VERIFY_TOKEN = "juyel123";
 const ACCESS_TOKEN = "EAANizvxgfaYBRNGHubwIKPgnlLQkm6bl9bLEhpIZCJO7cUMvcMNpGQcb6OcgZCt8MpsTyaHHfksrZBLPc8Eqf3FFOSDfvpX50Del2i519vmvfzSFadXT4gOBWELOGEUDFw1fZAHTsTfSHjaReAyc02094Xd6DViuSz953OliiZCc71vmY7KbYLkIgxagBhGzvwZAKyfxSZC5MZBnMBiul07BIoLHs3kW9LpaMLzh9jbzOemVyAvJtKb1rppGW3HlMxeIyRAiIMrtC3m32bbRjstZC";
 const PHONE_NUMBER_ID = "1073349015858656";
-const GEMINI_API_KEY = "AIzaSyAvFGOynJTrPsC5VLkDhCWQUuPXOP3x5cw";
+const GEMINI_API_KEY = "AIzaSyCQGQooNNnYfO-gR5ni9MNh2eome7u49M4";
+const PORT = 3000;
+
+// ============================
+// Routes
+// ============================
 
 // Home
 app.get("/", (req, res) => {
   res.send("AI WhatsApp Bot Running 🤖");
 });
 
-// Webhook verify
+// Webhook verification
 app.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
   if (mode && token === VERIFY_TOKEN) {
+    console.log("Webhook verified ✅");
     res.status(200).send(challenge);
   } else {
+    console.log("Webhook verification failed ❌");
     res.sendStatus(403);
   }
 });
 
-// AI function
+// ============================
+// AI function with error logging
+// ============================
 async function getAIResponse(userText) {
   try {
     const response = await axios.post(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
       {
         contents: [
-          {
-            parts: [{ text: userText }]
-          }
+          { parts: [{ text: userText }] }
         ]
       }
     );
-
     return response.data.candidates[0].content.parts[0].text;
   } catch (err) {
+    console.log("AI API Error:", err.response?.data || err.message);
     return "দুঃখিত, এখন উত্তর দিতে সমস্যা হচ্ছে।";
   }
 }
 
-// Receive message
+// ============================
+// Receive WhatsApp messages
+// ============================
 app.post("/webhook", async (req, res) => {
-  const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  try {
+    const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-  if (message) {
+    if (!message) return res.sendStatus(200);
+
     const from = message.from;
-    const text = message.text?.body;
+    const text = message?.text?.body || "";
 
     console.log("User:", text);
 
@@ -70,27 +84,36 @@ app.post("/webhook", async (req, res) => {
       reply = await getAIResponse(text);
     }
 
-    // Send reply
-    await axios.post(
-      `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: "whatsapp",
-        to: from,
-        text: { body: reply }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-          "Content-Type": "application/json"
+    // Send reply via WhatsApp API
+    try {
+      await axios.post(
+        `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
+        {
+          messaging_product: "whatsapp",
+          to: from,
+          text: { body: reply }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+          }
         }
-      }
-    );
+      );
+      console.log("Reply sent ✅");
+    } catch (err) {
+      console.log("WhatsApp send error:", err.response?.data || err.message);
+    }
+  } catch (err) {
+    console.log("Webhook processing error:", err.message);
   }
 
   res.sendStatus(200);
 });
 
-// Server start
-app.listen(3000, () => {
-  console.log("Server running with AI...");
+// ============================
+// Start server
+// ============================
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
