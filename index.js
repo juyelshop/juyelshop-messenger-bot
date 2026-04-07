@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 // ============================
-// Credentials (তোমার দেওয়া)
+// Credentials (place your secrets here)
 // ============================
 const VERIFY_TOKEN = "juyel123";
 const ACCESS_TOKEN = "EAANizvxgfaYBRNGHubwIKPgnlLQkm6bl9bLEhpIZCJO7cUMvcMNpGQcb6OcgZCt8MpsTyaHHfksrZBLPc8Eqf3FFOSDfvpX50Del2i519vmvfzSFadXT4gOBWELOGEUDFw1fZAHTsTfSHjaReAyc02094Xd6DViuSz953OliiZCc71vmY7KbYLkIgxagBhGzvwZAKyfxSZC5MZBnMBiul07BIoLHs3kW9LpaMLzh9jbzOemVyAvJtKb1rppGW3HlMxeIyRAiIMrtC3m32bbRjstZC";
@@ -72,12 +72,13 @@ app.post("/webhook", async (req, res) => {
 
     let reply = "";
 
-    // Custom rules (priority)
+    // Custom fixed replies (priority)
     if (text.toLowerCase().includes("delivery")) {
       reply = "ঢাকা সিটির ভিতরে ডেলিভারি চার্জ ৬০ টাকা, বাইরে ১২০ টাকা।";
     } else if (text.toLowerCase().includes("price")) {
       reply = "দাম জানতে ভিজিট করুন: https://juyelshop.com/";
     } else {
+      // AI generates response
       reply = await getAIResponse(text);
     }
 
