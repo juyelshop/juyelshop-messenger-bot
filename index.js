@@ -5,9 +5,7 @@ const app = express();
 app.use(express.json());
 
 const VERIFY_TOKEN = "juyel123";
-
-const ACCESS_TOKEN = "EAAZBDZCswgNHMBRASheyPoqZBHE52nGbYJoN7uyuILc4dF9IfYF6dtmmnofZCkhwcPh9Qnv2unVox0cYtczug1VbbdzldD0jgwWKSo8PpDYObwoCoceCvcQPFwOzEZCiBgZCQZCBWIhs0ZBhaM2czhg8DvSBj8XTWweo53Vx79z7pWdl3gaXikcLRMhhJnM3ZCv1BHgAr51CqPxldYs4A5QmNatS3btcTLV3bzBVgUVwxxTw02fti12tVU8mxmdXpfmunn38A4MjcxM9gMTNXjuZASwAZDZD";
-
+const ACCESS_TOKEN = "EAAZBDZCswgNHMBRATpFbSXo5UGHIY2gOJDoiZBtMuCOvRKI3NZAZB8Cdip092NbCfpKmImLZAq934YEWPycFsOTIaUDhowJ0ayz1TDaLKbXpbmCzhgqmBmFhjiRYw1XhT9kIDwvOnstlyOcP7drdEGp8Y341ZB4V8JN0Vf0UBNVZBFuWsw2FRGtKgDirIrm5gH4XkqmjFwgUdmPk65MSdSfFdWwh0aBRnbkTJ3Fs0EQCh9h1U8dgrHiGv9E7AtV4PRKJ9H5kud5dYsrv8jgyx1Yx";
 const PHONE_NUMBER_ID = "1073349015858656";
 
 // Home
@@ -28,18 +26,20 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-// Message receive + smart reply
+// Webhook receive
 app.post("/webhook", async (req, res) => {
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  if (!message) return res.sendStatus(200);
 
-  if (message) {
-    const from = message.from;
-    const text = message.text?.body?.toLowerCase().trim();
+  const from = message.from;
+  const text = message?.text?.body?.toLowerCase().trim();
 
-    console.log("Message:", text);
+  if (!text) return res.sendStatus(200);
 
-    // Bag
-    if (text && text.includes("bag")) {
+  console.log("Received:", text);
+
+  try {
+    if (/bag/i.test(text)) {
       await axios.post(
         `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
         {
@@ -51,17 +51,9 @@ app.post("/webhook", async (req, res) => {
             caption: "📦 Premium Travel Bag\n💰 Price: 990 TK\n📝 High quality stylish bag"
           }
         },
-        {
-          headers: {
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}`, "Content-Type": "application/json" } }
       );
-    }
-
-    // Watch
-    else if (text && text.includes("watch")) {
+    } else if (/watch/i.test(text)) {
       await axios.post(
         `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
         {
@@ -73,17 +65,9 @@ app.post("/webhook", async (req, res) => {
             caption: "⌚ Luxury Watch\n💰 Price: 650 TK\n📝 Stylish watch for men"
           }
         },
-        {
-          headers: {
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}`, "Content-Type": "application/json" } }
       );
-    }
-
-    // Default reply
-    else {
+    } else {
       await axios.post(
         `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
         {
@@ -91,19 +75,14 @@ app.post("/webhook", async (req, res) => {
           to: from,
           text: { body: "দয়া করে bag / watch লিখুন" }
         },
-        {
-          headers: {
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-          }
-        }
+        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}`, "Content-Type": "application/json" } }
       );
     }
+  } catch (err) {
+    console.error("Error sending message:", err.response?.data || err.message);
   }
 
   res.sendStatus(200);
 });
 
-app.listen(3000, () => {
-  console.log("Server running...");
-});
+app.listen(3000, () => console.log("Server running on port 3000..."));
