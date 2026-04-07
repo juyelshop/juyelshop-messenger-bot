@@ -1,122 +1,76 @@
 const express = require("express");
 const axios = require("axios");
-
 const app = express();
+
 app.use(express.json());
 
-// 🔹 CONFIG
+// তোমার data বসাও
 const VERIFY_TOKEN = "juyel123";
 const ACCESS_TOKEN = "EAANizvxgfaYBRGl2FbZBD9pjtNg6WCACrmCyPhGPh2WMegqRIT91qcrUzWQvmjncUkdnxbRicyzqBZCzsyIKZBcnRqJSYgrh9JbcNri1ZAyLwd9bCexfbFsgQB21mLQubp0RRPeIRWHNYIfZCSVfUO1E5gZBsQ2A9nBUmDbZBmigbSS9cIZAHVQ424P298NOQa6BYfeP5ftde42dedOM7LOtOWWylDWtlIzfZADR6KhU4zDZCZCfg1IVALHJAZAVPlMu6ytn1N2EdS3jWP8i9lcGn3IV";
 const PHONE_NUMBER_ID = "1073349015858656";
+const GEMINI_API_KEY = "AIzaSyAvFGOynJTrPsC5VLkDhCWQUuPXOP3x5cw";
 
-// 🔹 CATEGORY LINK (তুমি চাইলে বাড়াতে পারো)
-const categories = [
-  { keywords: ["t-shirt","shirt"], link: "https://juyelshop.com/category/t-shirts" },
-  { keywords: ["bag"], link: "https://juyelshop.com/category/bags" },
-  { keywords: ["watch"], link: "https://juyelshop.com/category/watches" }
-];
-
-// 🔹 AUTO REPLY FUNCTION
-function autoReply(text) {
-  text = text.toLowerCase();
-
-  // Price
-  if (
-    text.includes("price") ||
-    text.includes("দাম") ||
-    text.includes("কত টাকা") ||
-    text.includes("কত দাম")
-  ) {
-    return "💰 প্রোডাক্টের দাম ও বিস্তারিত জানতে আমাদের ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
-  }
-
-  // Delivery
-  if (text.includes("delivery") || text.includes("ডেলিভারি")) {
-    return "🚚 ডেলিভারি চার্জ:\nঢাকা সিটির ভিতরে: ৬০ টাকা\nঢাকার বাইরে: ১২০ টাকা\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি।";
-  }
-
-  // Order
-  if (
-    text.includes("order") ||
-    text.includes("অর্ডার") ||
-    text.includes("buy") ||
-    text.includes("কিনতে চাই")
-  ) {
-    return "🛒 অর্ডার করতে আমাদের ওয়েবসাইটে যান:\nhttps://juyelshop.com/";
-  }
-
-  // Location
-  if (
-    text.includes("location") ||
-    text.includes("ঠিকানা") ||
-    text.includes("কোথায়")
-  ) {
-    return "📍 আমরা একটি অনলাইন ভিত্তিক শপ।\nবিস্তারিত জানতে ভিজিট করুন:\nhttps://juyelshop.com/";
-  }
-
-  // Contact
-  if (
-    text.includes("contact") ||
-    text.includes("নাম্বার") ||
-    text.includes("phone")
-  ) {
-    return "📞 যোগাযোগের জন্য আমাদের ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
-  }
-
-  // Greeting
-  if (/^(hi|hello|হাই|হ্যালো)$/.test(text)) {
-    return "👋 স্বাগতম! আপনি কোন প্রোডাক্ট খুঁজছেন?";
-  }
-
-  // Default
-  return "🙏 ধন্যবাদ স্যার,\nকিছুক্ষণ অপেক্ষা করুন, আমাদের একজন প্রতিনিধি আপনার সাথে দ্রুত যোগাযোগ করবে।";
-}
-
-// 🔹 FIND CATEGORY
-function findCategory(text) {
-  return categories.find(cat =>
-    cat.keywords.some(k => text.toLowerCase().includes(k))
-  );
-}
-
-// 🔹 HOME
+// Home
 app.get("/", (req, res) => {
-  res.send("Bot Running ✅");
+  res.send("AI WhatsApp Bot Running 🤖");
 });
 
-// 🔹 VERIFY WEBHOOK
+// Webhook verify
 app.get("/webhook", (req, res) => {
-  if (req.query["hub.verify_token"] === VERIFY_TOKEN) {
-    return res.send(req.query["hub.challenge"]);
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode && token === VERIFY_TOKEN) {
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
   }
-  res.sendStatus(403);
 });
 
-// 🔹 MAIN BOT
+// AI function
+async function getAIResponse(userText) {
+  try {
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            parts: [{ text: userText }]
+          }
+        ]
+      }
+    );
+
+    return response.data.candidates[0].content.parts[0].text;
+  } catch (err) {
+    return "দুঃখিত, এখন উত্তর দিতে সমস্যা হচ্ছে।";
+  }
+}
+
+// Receive message
 app.post("/webhook", async (req, res) => {
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-  if (!message) return res.sendStatus(200);
+  if (message) {
+    const from = message.from;
+    const text = message.text?.body;
 
-  const from = message.from;
-  const text = message.text?.body?.trim();
+    console.log("User:", text);
 
-  if (!text) return res.sendStatus(200);
+    let reply = "";
 
-  console.log("User:", text);
+    // Custom rules (priority)
+    if (text.toLowerCase().includes("delivery")) {
+      reply = "ঢাকা সিটির ভিতরে ডেলিভারি চার্জ ৬০ টাকা, বাইরে ১২০ টাকা।";
+    } else if (text.toLowerCase().includes("price")) {
+      reply = "দাম জানতে ভিজিট করুন: https://juyelshop.com/";
+    } else {
+      // AI reply
+      reply = await getAIResponse(text);
+    }
 
-  let reply = "";
-
-  const category = findCategory(text);
-
-  if (category) {
-    reply = `🔗 এই ক্যাটাগরি দেখুন:\n${category.link}`;
-  } else {
-    reply = autoReply(text);
-  }
-
-  // 🔹 SEND MESSAGE
-  try {
+    // Send reply
     await axios.post(
       `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
       {
@@ -131,14 +85,12 @@ app.post("/webhook", async (req, res) => {
         }
       }
     );
-  } catch (err) {
-    console.log("Error:", err.response?.data || err.message);
   }
 
   res.sendStatus(200);
 });
 
-// 🔹 START SERVER
+// Server start
 app.listen(3000, () => {
-  console.log("Server running 🚀");
+  console.log("Server running with AI...");
 });
