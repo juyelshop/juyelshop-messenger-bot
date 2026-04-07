@@ -28,34 +28,18 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-// Message receive + product reply
+// Message receive + smart reply
 app.post("/webhook", async (req, res) => {
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
   if (message) {
     const from = message.from;
-    const text = message.text?.body?.toLowerCase();
+    const text = message.text?.body?.toLowerCase().trim();
 
     console.log("Message:", text);
 
-    const products = {
-      bag: {
-        name: "Premium Travel Bag",
-        price: "990 TK",
-        image: "https://via.placeholder.com/300",
-        description: "High quality stylish bag"
-      },
-      watch: {
-        name: "Luxury Watch",
-        price: "650 TK",
-        image: "https://via.placeholder.com/300",
-        description: "Stylish watch"
-      }
-    };
-
-    if (products[text]) {
-      const product = products[text];
-
+    // Bag
+    if (text && text.includes("bag")) {
       await axios.post(
         `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
         {
@@ -63,8 +47,8 @@ app.post("/webhook", async (req, res) => {
           to: from,
           type: "image",
           image: {
-            link: product.image,
-            caption: `📦 ${product.name}\n💰 Price: ${product.price}\n📝 ${product.description}`
+            link: "https://via.placeholder.com/300",
+            caption: "📦 Premium Travel Bag\n💰 Price: 990 TK\n📝 High quality stylish bag"
           }
         },
         {
@@ -74,7 +58,32 @@ app.post("/webhook", async (req, res) => {
           }
         }
       );
-    } else {
+    }
+
+    // Watch
+    else if (text && text.includes("watch")) {
+      await axios.post(
+        `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
+        {
+          messaging_product: "whatsapp",
+          to: from,
+          type: "image",
+          image: {
+            link: "https://via.placeholder.com/300",
+            caption: "⌚ Luxury Watch\n💰 Price: 650 TK\n📝 Stylish watch for men"
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    }
+
+    // Default reply
+    else {
       await axios.post(
         `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
         {
