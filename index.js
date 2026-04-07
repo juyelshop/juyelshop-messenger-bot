@@ -1,12 +1,12 @@
 const express = require("express");
 const axios = require("axios");
-const app = express();
 
+const app = express();
 app.use(express.json());
 
-// তোমার data বসাও
+// ðŸ”¹ CONFIG
 const VERIFY_TOKEN = "juyel123";
-const ACCESS_TOKEN = "EAANizvxgfaYBRGl2FbZBD9pjtNg6WCACrmCyPhGPh2WMegqRIT91qcrUzWQvmjncUkdnxbRicyzqBZCzsyIKZBcnRqJSYgrh9JbcNri1ZAyLwd9bCexfbFsgQB21mLQubp0RRPeIRWHNYIfZCSVfUO1E5gZBsQ2A9nBUmDbZBmigbSS9cIZAHVQ424P298NOQa6BYfeP5ftde42dedOM7LOtOWWylDWtlIzfZADR6KhU4zDZCZCfg1IVALHJAZAVPlMu6ytn1N2EdS3jWP8i9lcGn3IV";
+const ACCESS_TOKEN = "EAANizvxgfaYBRNGHubwIKPgnlLQkm6bl9bLEhpIZCJO7cUMvcMNpGQcb6OcgZCt8MpsTyaHHfksrZBLPc8Eqf3FFOSDfvpX50Del2i519vmvfzSFadXT4gOBWELOGEUDFw1fZAHTsTfSHjaReAyc02094Xd6DViuSz953OliiZCc71vmY7KbYLkIgxagBhGzvwZAKyfxSZC5MZBnMBiul07BIoLHs3kW9LpaMLzh9jbzOemVyAvJtKb1rppGW3HlMxeIyRAiIMrtC3m32bbRjstZC";
 const PHONE_NUMBER_ID = "1073349015858656";
 const GEMINI_API_KEY = "AIzaSyAvFGOynJTrPsC5VLkDhCWQUuPXOP3x5cw";
 
