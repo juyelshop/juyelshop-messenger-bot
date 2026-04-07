@@ -4,7 +4,9 @@ const app = express();
 
 app.use(express.json());
 
-const ACCESS_TOKEN = "EAAZBDZCswgNHMBRHslekXl8XePHQ9MoayFz5JLR7ZCNSBhSZCDzTCMzwIBqmKg7kagAZCgJZBgZCrHO9F5dREIgzDGBIxuhQXY0Gu79ZAlCygMA531Dr3M7S3ffsZBadbAEo8ZA9KvYvzVxZCJBBViJ4c9JwlPXvgi3Kw3ZCOhPIBQzLHtQpBclZA36ZBKNHquoay5s1OhTCIHZBvNYXf6OCVENvKanJgwzAJX7uvZBZAGCP2N6JzIZBoyEPREqRH6fGCWZC0rRbBh3ZCr4EhSM8ViJKBnTp0ZAvm";
+const VERIFY_TOKEN = "juyel123";
+
+const ACCESS_TOKEN = "EAAZBDZCswgNHMBRCRQTLZBur4TUIKlH3bXkjOeMbl2JCcu8Jd6G6ufkbBGRGutCNCqifyCMMZBo6nhRiFVURLhnGOW8CQRxyGyWios0BZB7XbVD9Xtx2Rx5bDu1INId2iekrSrG9OwVp69a8D6ZBVhZAeuBqzqQ48VyHMuAp1SEZAH0lRD9OoCGPu1ZArszoCCZAlZAuyor9ysDAZBN1K8IqWxZAOCIw0KFFnSmKU7cmgT9D1XvNxdU5yO8QEpcVeZBibKAazhV9CxZATvJu39eNe8e1ZCfAPQZDZD";
 
 const PHONE_NUMBER_ID = "1073349015858656";
 
@@ -26,7 +28,7 @@ app.get("/webhook", (req, res) => {
   }
 });
 
-// Message receive
+// Message receive + product reply
 app.post("/webhook", async (req, res) => {
   const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
@@ -36,19 +38,18 @@ app.post("/webhook", async (req, res) => {
 
     console.log("Message:", text);
 
-    // Product list
     const products = {
-      "bag": {
+      bag: {
         name: "Premium Travel Bag",
         price: "990 TK",
         image: "https://via.placeholder.com/300",
         description: "High quality stylish bag"
       },
-      "watch": {
+      watch: {
         name: "Luxury Watch",
         price: "650 TK",
         image: "https://via.placeholder.com/300",
-        description: "Stylish watch for men"
+        description: "Stylish watch"
       }
     };
 
@@ -74,44 +75,25 @@ app.post("/webhook", async (req, res) => {
         }
       );
     } else {
-      await sendMessage(from, "দয়া করে bag / watch লিখুন");
+      await axios.post(
+        `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
+        {
+          messaging_product: "whatsapp",
+          to: from,
+          text: { body: "দয়া করে bag / watch লিখুন" }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
     }
   }
 
   res.sendStatus(200);
 });
-  const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-
-  if (message) {
-    const from = message.from;
-    const text = message.text?.body;
-
-    console.log("Message:", text);
-
-    // Reply
-    await sendMessage(from, `আপনি লিখেছেন: ${text}`);
-  }
-
-  res.sendStatus(200);
-});
-
-// Send message
-async function sendMessage(to, text) {
-  await axios.post(
-    `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
-    {
-      messaging_product: "whatsapp",
-      to: to,
-      text: { body: text }
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-        "Content-Type": "application/json"
-      }
-    }
-  );
-}
 
 app.listen(3000, () => {
   console.log("Server running...");
