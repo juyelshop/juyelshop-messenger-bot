@@ -9,7 +9,7 @@ app.use(express.json());
 // Credentials (place your secrets here)
 // ============================
 const VERIFY_TOKEN = "juyel123";
-const ACCESS_TOKEN = "EAANizvxgfaYBRNGHubwIKPgnlLQkm6bl9bLEhpIZCJO7cUMvcMNpGQcb6OcgZCt8MpsTyaHHfksrZBLPc8Eqf3FFOSDfvpX50Del2i519vmvfzSFadXT4gOBWELOGEUDFw1fZAHTsTfSHjaReAyc02094Xd6DViuSz953OliiZCc71vmY7KbYLkIgxagBhGzvwZAKyfxSZC5MZBnMBiul07BIoLHs3kW9LpaMLzh9jbzOemVyAvJtKb1rppGW3HlMxeIyRAiIMrtC3m32bbRjstZC";
+const ACCESS_TOKEN = "EAANizvxgfaYBRP3EbYisIKmTuC3A2ijQghiUoh23lxw2kndWDZBr66lgNY4tpCj5P2xo4mLhrRqu87MZCQk3F97HMnao2Ij8Qen9XgF9p07sRNMwUfGBWGlR9eL81HCS4vArbMKweGuGdVQMrOkHjd1K1E5gNCSDZCJ1U6ZBozyJvv2QHDMGRjP5zIRyhmwGxOmrSXXongVbZAyZB7irsPXtGlAQJC7OcNZC8oIZCqgGMkMTK1WQhrMrmrD8SiPfaANhTtGXCgMs5wcUcD0XMaMc";
 const PHONE_NUMBER_ID = "1073349015858656";
 const GEMINI_API_KEY = "AIzaSyCQGQooNNnYfO-gR5ni9MNh2eome7u49M4";
 const PORT = 3000;
