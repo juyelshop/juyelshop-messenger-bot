@@ -69,7 +69,7 @@ function autoReply(text) {
   text.includes("number")
 ) {
   return "আপনার সুবিধার জন্য আমাদের কাস্টমার সাপোর্ট নাম্বার নিচে দেওয়া হলো 👇\n\n📞 01999713777\n☎️ 09649100004\n📲 WhatsApp / Call Available\n\nধন্যবাদ JUYEL SHOP-এর সাথে থাকার জন্য 😊";
-  }
+}
   
 // কাস্টমার যে প্রশ্নগুলো করলে রিপ্লে যাবে
 const deliveryQuestions = [
