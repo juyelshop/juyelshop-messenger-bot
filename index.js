@@ -23,6 +23,16 @@ const categories = [
 function autoReply(text) {
   text = text.toLowerCase();
 
+  // Greeting
+  if (
+    text.includes("hi") ||
+    text.includes("hello") ||
+    text.includes("হাই") ||
+    text.includes("হ্যালো")
+  ) {
+    return "হ্যালো 👋 JUYEL SHOP-এ আপনাকে স্বাগতম।\nআপনি কোন প্রোডাক্ট খুঁজছেন জানালে আমি আপনাকে দেখাতে পারি 😊";
+  }
+
   // Price
   if (
     text.includes("price") ||
@@ -48,27 +58,14 @@ function autoReply(text) {
     return "🛒 অর্ডার করতে আমাদের ওয়েবসাইটে যান:\nhttps://juyelshop.com/";
   }
 
-  // Location
-  if (
-    text.includes("location") ||
-    text.includes("ঠিকানা") ||
-    text.includes("কোথায়")
-  ) {
-    return "📍 আমরা একটি অনলাইন ভিত্তিক শপ।\nবিস্তারিত জানতে ভিজিট করুন:\nhttps://juyelshop.com/";
-  }
-
   // Contact
   if (
     text.includes("contact") ||
     text.includes("নাম্বার") ||
     text.includes("phone")
   ) {
-    return "আপনার সুবিধার জন্য আমাদের কাস্টমার সাপোর্ট নাম্বার নিচে দেওয়া হলো 👇, \n📞 01999713777, \n☎️ 09649100004, \n📲 WhatsApp / Call Available, \nধন্যবাদ JUYEL SHOP-এর সাথে থাকার জন্য 😊 ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
+    return "📞 01999713777\n☎️ 09649100004\n📲 WhatsApp / Call Available\n\n🌐 https://juyelshop.com/";
   }
-
-  // Greeting
-  if (/^(hi|hello|হাই|হ্যালো)$/.test(text)) {
-    return "হ্যালো 👋 JUYEL SHOP-এ আপনাকে স্বাগতম।, \nআপনি কোন প্রোডাক্ট খুঁজছেন জানালে আমি আপনাকে দেখাতে পারি 😊";
 
   // Default
   return "🙏 ধন্যবাদ স্যার,\nকিছুক্ষণ অপেক্ষা করুন, আমাদের একজন প্রতিনিধি আপনার সাথে দ্রুত যোগাযোগ করবে।";
