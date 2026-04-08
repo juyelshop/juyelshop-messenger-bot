@@ -60,11 +60,15 @@ function autoReply(text) {
 
   // Contact
   if (
-    text.includes("contact") ||
-    text.includes("নাম্বার") ||
-    text.includes("phone")
-  ) {
-    return "📞 01999713777\n☎️ 09649100004\n📲 WhatsApp / Call Available\n\n🌐 https://juyelshop.com/";
+  text.includes("contact") ||
+  text.includes("কল করব") ||
+  text.includes("কন্ট্রাক্ট") ||  
+  text.includes("নাম্বার") ||
+  text.includes("ফোন নাম্বার") ||
+  text.includes("নাম্বার") ||
+  text.includes("number")
+) {
+  return "আপনার সুবিধার জন্য আমাদের কাস্টমার সাপোর্ট নাম্বার নিচে দেওয়া হলো 👇\n\n📞 01999713777\n☎️ 09649100004\n📲 WhatsApp / Call Available\n\nধন্যবাদ JUYEL SHOP-এর সাথে থাকার জন্য 😊";
   }
 
   // Default
