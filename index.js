@@ -44,19 +44,23 @@ app.get("/webhook", (req, res) => {
 async function getAIResponse(userText) {
   try {
     const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/text-bison-001:generateText?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
-        prompt: [{ text: userText }],
-        temperature: 0.7,
-        candidate_count: 1
+        contents: [
+          {
+            parts: [{ text: userText }]
+          }
+        ]
       }
     );
-    return response.data.candidates[0].content[0].text;
+
+    return response.data.candidates[0].content.parts[0].text;
+
   } catch (err) {
-    console.log("AI API Error:", err.response?.data || err.message);
+    console.log("AI Error:", err.response?.data || err.message);
     return "দুঃখিত, এখন উত্তর দিতে সমস্যা হচ্ছে।";
   }
-}
+        }
 
 // ============================
 // Receive WhatsApp messages
