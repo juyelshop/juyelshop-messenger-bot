@@ -63,13 +63,20 @@ function autoReply(text) {
     text.includes("নাম্বার") ||
     text.includes("phone")
   ) {
-    return "📞 যোগাযোগের জন্য আমাদের ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
+    return "আপনার সুবিধার জন্য আমাদের কাস্টমার সাপোর্ট নাম্বার নিচে দেওয়া হলো 👇
+
+📞 01XXXXXXXXX  
+📲 WhatsApp / Call Available
+    
+ধন্যবাদ JuyelShop-এর সাথে থাকার জন্য 😊 ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
   }
 
   // Greeting
   if (/^(hi|hello|হাই|হ্যালো)$/.test(text)) {
-    return "👋 স্বাগতম! আপনি কোন প্রোডাক্ট খুঁজছেন?";
-  }
+    return "হ্যালো 👋  
+JUYEL SHOP-এ আপনাকে স্বাগতম।
+
+আপনি কোন প্রোডাক্ট খুঁজছেন জানালে আমি আপনাকে দেখাতে পারি 😊";
 
   // Default
   return "🙏 ধন্যবাদ স্যার,\nকিছুক্ষণ অপেক্ষা করুন, আমাদের একজন প্রতিনিধি আপনার সাথে দ্রুত যোগাযোগ করবে।";
