@@ -11,112 +11,137 @@ app.use(express.json());
 const VERIFY_TOKEN = "juyel123";
 const ACCESS_TOKEN = "EAANizvxgfaYBRP3EbYisIKmTuC3A2ijQghiUoh23lxw2kndWDZBr66lgNY4tpCj5P2xo4mLhrRqu87MZCQk3F97HMnao2Ij8Qen9XgF9p07sRNMwUfGBWGlR9eL81HCS4vArbMKweGuGdVQMrOkHjd1K1E5gNCSDZCJ1U6ZBozyJvv2QHDMGRjP5zIRyhmwGxOmrSXXongVbZAyZB7irsPXtGlAQJC7OcNZC8oIZCqgGMkMTK1WQhrMrmrD8SiPfaANhTtGXCgMs5wcUcD0XMaMc";
 const PHONE_NUMBER_ID = "1073349015858656";
-const GEMINI_API_KEY = "AIzaSyCQGQooNNnYfO-gR5ni9MNh2eome7u49M4";
-const PORT = 3000;
 
-// ============================
-// Home route
-// ============================
-app.get("/", (req, res) => {
-  res.send("AI WhatsApp Bot Running 🤖");
-});
+// // 🔹 CATEGORY LINK (তুমি চাইলে বাড়াতে পারো)
+const categories = [
+  { keywords: ["t-shirt","shirt"], link: "https://juyelshop.com/category/t-shirts" },
+  { keywords: ["bag"], link: "https://juyelshop.com/category/bags" },
+  { keywords: ["watch"], link: "https://juyelshop.com/category/watches" }
+];
 
-// ============================
-// Webhook verification
-// ============================
-app.get("/webhook", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
+// 🔹 AUTO REPLY FUNCTION
+function autoReply(text) {
+  text = text.toLowerCase();
 
-  if (mode && token === VERIFY_TOKEN) {
-    console.log("Webhook verified ✅");
-    res.status(200).send(challenge);
-  } else {
-    console.log("Webhook verification failed ❌");
-    res.sendStatus(403);
+  // Price
+  if (
+    text.includes("price") ||
+    text.includes("দাম") ||
+    text.includes("কত টাকা") ||
+    text.includes("কত দাম")
+  ) {
+    return "💰 প্রোডাক্টের দাম ও বিস্তারিত জানতে আমাদের ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
   }
+
+  // Delivery
+  if (text.includes("delivery") || text.includes("ডেলিভারি")) {
+    return "🚚 ডেলিভারি চার্জ:\nঢাকা সিটির ভিতরে: ৬০ টাকা\nঢাকার বাইরে: ১২০ টাকা\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি।";
+  }
+
+  // Order
+  if (
+    text.includes("order") ||
+    text.includes("অর্ডার") ||
+    text.includes("buy") ||
+    text.includes("কিনতে চাই")
+  ) {
+    return "🛒 অর্ডার করতে আমাদের ওয়েবসাইটে যান:\nhttps://juyelshop.com/";
+  }
+
+  // Location
+  if (
+    text.includes("location") ||
+    text.includes("ঠিকানা") ||
+    text.includes("কোথায়")
+  ) {
+    return "📍 আমরা একটি অনলাইন ভিত্তিক শপ।\nবিস্তারিত জানতে ভিজিট করুন:\nhttps://juyelshop.com/";
+  }
+
+  // Contact
+  if (
+    text.includes("contact") ||
+    text.includes("নাম্বার") ||
+    text.includes("phone")
+  ) {
+    return "📞 যোগাযোগের জন্য আমাদের ওয়েবসাইট ভিজিট করুন:\nhttps://juyelshop.com/";
+  }
+
+  // Greeting
+  if (/^(hi|hello|হাই|হ্যালো)$/.test(text)) {
+    return "👋 স্বাগতম! আপনি কোন প্রোডাক্ট খুঁজছেন?";
+  }
+
+  // Default
+  return "🙏 ধন্যবাদ স্যার,\nকিছুক্ষণ অপেক্ষা করুন, আমাদের একজন প্রতিনিধি আপনার সাথে দ্রুত যোগাযোগ করবে।";
+}
+
+// 🔹 FIND CATEGORY
+function findCategory(text) {
+  return categories.find(cat =>
+    cat.keywords.some(k => text.toLowerCase().includes(k))
+  );
+}
+
+// 🔹 HOME
+app.get("/", (req, res) => {
+  res.send("Bot Running ✅");
 });
 
-// ============================
-// AI Response function
-// ============================
-async function getAIResponse(userText) {
+// 🔹 VERIFY WEBHOOK
+app.get("/webhook", (req, res) => {
+  if (req.query["hub.verify_token"] === VERIFY_TOKEN) {
+    return res.send(req.query["hub.challenge"]);
+  }
+  res.sendStatus(403);
+});
+
+// 🔹 MAIN BOT
+app.post("/webhook", async (req, res) => {
+  const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+
+  if (!message) return res.sendStatus(200);
+
+  const from = message.from;
+  const text = message.text?.body?.trim();
+
+  if (!text) return res.sendStatus(200);
+
+  console.log("User:", text);
+
+  let reply = "";
+
+  const category = findCategory(text);
+
+  if (category) {
+    reply = `🔗 এই ক্যাটাগরি দেখুন:\n${category.link}`;
+  } else {
+    reply = autoReply(text);
+  }
+
+  // 🔹 SEND MESSAGE
   try {
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    await axios.post(
+      `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
       {
-        contents: [
-          {
-            parts: [{ text: userText }]
-          }
-        ]
+        messaging_product: "whatsapp",
+        to: from,
+        text: { body: reply }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${ACCESS_TOKEN}`,
+          "Content-Type": "application/json"
+        }
       }
     );
-
-    return response.data.candidates[0].content.parts[0].text;
-
   } catch (err) {
-    console.log("AI Error:", err.response?.data || err.message);
-    return "দুঃখিত, এখন উত্তর দিতে সমস্যা হচ্ছে।";
-  }
-        }
-
-// ============================
-// Receive WhatsApp messages
-// ============================
-app.post("/webhook", async (req, res) => {
-  try {
-    const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-    if (!message) return res.sendStatus(200);
-
-    const from = message.from;
-    const text = message?.text?.body || "";
-    console.log("User:", text);
-
-    let reply = "";
-
-    // Custom fixed replies (priority)
-    if (text.toLowerCase().includes("delivery")) {
-      reply = "ঢাকা সিটির ভিতরে ডেলিভারি চার্জ ৬০ টাকা, বাইরে ১২০ টাকা।";
-    } else if (text.toLowerCase().includes("price")) {
-      reply = "দাম জানতে ভিজিট করুন: https://juyelshop.com/";
-    } else {
-      // AI generates response
-      reply = await getAIResponse(text);
-    }
-
-    // Send reply via WhatsApp API
-    try {
-      await axios.post(
-        `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
-        {
-          messaging_product: "whatsapp",
-          to: from,
-          text: { body: reply }
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-      console.log("Reply sent ✅");
-    } catch (err) {
-      console.log("WhatsApp send error:", err.response?.data || err.message);
-    }
-
-  } catch (err) {
-    console.log("Webhook processing error:", err.message);
+    console.log("Error:", err.response?.data || err.message);
   }
 
   res.sendStatus(200);
 });
 
-// ============================
-// Start server
-// ============================
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+// 🔹 START SERVER
+app.listen(3000, () => {
+  console.log("Server running 🚀");
 });
