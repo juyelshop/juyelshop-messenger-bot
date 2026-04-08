@@ -45,7 +45,7 @@ function autoReply(text) {
 
   // Delivery
   if (text.includes("delivery") || text.includes("ডেলিভারি")) {
-    return "🚚 ডেলিভারি চার্জ:\nঢাকা সিটির ভিতরে: ৬০ টাকা\nঢাকার বাইরে: ১২০ টাকা\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি,\n 🚚 ডেলিভারি সময়:\nঢাকা সিটির ভিতরে: ১-২ দিন\nঢাকার বাইরে: ২-৪ দিন\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি😊";
+    return "🚚 ডেলিভারি চার্জ:\nঢাকা সিটির ভিতরে: ৬০ টাকা\nঢাকার বাইরে: ১২০ টাকা\n\n 🚚 ডেলিভারি সময়:\nঢাকা সিটির ভিতরে: ১-২ দিন\nঢাকার বাইরে: ২-৪ দিন\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি,🏘️+🚴+🚚";
   }
 
   // Order
@@ -71,26 +71,6 @@ function autoReply(text) {
   return "আপনার সুবিধার জন্য আমাদের কাস্টমার সাপোর্ট নাম্বার নিচে দেওয়া হলো 👇\n\n📞 01999713777\n☎️ 09649100004\n📲 WhatsApp / Call Available\n\nধন্যবাদ JUYEL SHOP-এর সাথে থাকার জন্য 😊";
 }
   
-// Delivery Time
-if (
-  text.includes("delivery time") ||
-  text.includes("how many days delivery") ||
-  text.includes("how long delivery") ||
-  text.includes("when will I get it") ||
-  text.includes("delivery koto din") ||
-  text.includes("delivery time koto") ||
-  text.includes("ডেলিভারি আসতে কতদিন লাগবে") ||
-  text.includes("কত দিনে পাবো") ||
-  text.includes("কবে ডেলিভারি দিবেন") ||
-  text.includes("ডেলিভারি টাইম কত") ||
-  text.includes("কয়দিনে হাতে পাবো") ||
-  text.includes("কতদিন লাগবে") ||
-  text.includes("ঢাকায় কতদিন লাগে") ||
-  text.includes("বাইরে কতদিন লাগে")
-) {
-  return "🚚 ডেলিভারি সময়:\nঢাকা সিটির ভিতরে: ১-২ দিন\nঢাকার বাইরে: ২-৪ দিন\n\nআমরা সারা বাংলাদেশে হোম ডেলিভারি দিয়ে থাকি 😊";
-}
-
   // Default
   return "🙏 ধন্যবাদ স্যার,\nকিছুক্ষণ অপেক্ষা করুন, আমাদের একজন প্রতিনিধি আপনার সাথে দ্রুত যোগাযোগ করবে।";
 }
