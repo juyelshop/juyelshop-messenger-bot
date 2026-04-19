@@ -9,7 +9,7 @@ app.use(express.json());
 // Credentials (place your secrets here)
 // ============================
 const VERIFY_TOKEN = "juyel123";
-const ACCESS_TOKEN = "EAANizvxgfaYBRIZAxR4kpZCQDRdPvEJSBGkedwxbVEZBM6y4qkE2YM9mlYe3ZAzR0MJB5IaiLe1cvLmY1lItlg8cqFsazlcu3bJJ24bFtx3vKwZAgyBmX89L5iombLkcgqVan6WDGEte6I9UiFKG6Rc0AAURCtTeGnproFmcZC2BlpZCX2WfxFsivqzxZAvUqD73dmFOgW0TNqhKcciHims2ZCUO7IpRgYcsZBbPOqZAq1NUBmTyzkYwND6GRMhFO7jJu90WRgZCc7q2rbmJkGjEn0Rs";
+const ACCESS_TOKEN = "EAANizvxgfaYBREFlK6GZCgSn0OTlffGujpqNYZBlYWKQrHwg1Xdb7ZCAdD9u2f0vLfrPvgcDW9DZArx4ekyhI5bl5sToAd34SIK74drRqNvZBTDLpTPQZBqJq6IQ8reBoOpKpwHKKZCY8tc8KBDPJuaGFxiggUP1ZB4mpMA2mXGxEToHr7UDRHkuolyrWLcgn3vG1sfDtMtsB5bbEUytjGaZBEcrSxZBmygyQqJze4szzLzXpe6BBxMicHXaiajwtA078ODlnNs8liP9g6BPv0KxZBx";
 const PHONE_NUMBER_ID = "1073349015858656";
 
 // // 🔹 CATEGORY LINK (তুমি চাইলে বাড়াতে পারো)
